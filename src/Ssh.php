@@ -16,6 +16,8 @@ class Ssh
 
     protected ?int $port;
 
+    protected ?string $proxyJump = '';
+
     protected bool $enableStrictHostChecking = true;
 
     protected bool $identitiesOnly = false;
@@ -49,6 +51,13 @@ class Ssh
     public function usePrivateKey(string $pathToPrivateKey): self
     {
         $this->pathToPrivateKey = $pathToPrivateKey;
+
+        return $this;
+    }
+
+    public function useProxyJump(string $ip): self
+    {
+        $this->proxyJump = $ip;
 
         return $this;
     }
@@ -150,9 +159,9 @@ class Ssh
 
         $target = $this->getTarget();
 
-        return "ssh {$extraOptions} {$target} 'bash -se' << \\$delimiter".PHP_EOL
-            .$commandString.PHP_EOL
-            .$delimiter;
+        return "ssh {$extraOptions} {$target} 'bash -se' << \\$delimiter" . PHP_EOL
+            . $commandString . PHP_EOL
+            . $delimiter;
     }
 
     /**
@@ -246,6 +255,10 @@ class Ssh
 
         if ($this->identitiesOnly) {
             $extraOptions[] = '-o IdentitiesOnly=yes';
+        }
+
+        if ($this->proxyJump) {
+            $extraOptions[] = '-J ' . $this->proxyJump;
         }
 
         if ($this->quietMode) {

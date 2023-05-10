@@ -46,6 +46,14 @@ class SshTest extends TestCase
     }
 
     /** @test */
+    public function it_can_use_a_specific_proxy_jump()
+    {
+        $command = $this->ssh->useProxyJump('1.2.3.4')->getExecuteCommand('whoami');
+
+        $this->assertMatchesSnapshot($command);
+    }
+
+    /** @test */
     public function it_can_set_the_port_via_the_constructor()
     {
         $command = (new Ssh('user', 'example.com', 123))->getExecuteCommand('whoami');
